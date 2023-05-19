@@ -3,7 +3,7 @@
 function tryToPass($input)
 {
 
-    $asyncQuery = new PDO("mysql:host=localhost;dbname=example", "example_manage", "Example_0815");
+    $asyncQuery = new PDO("mysql:host=localhost;dbname=becks-pizza", "becks-pizza", "Z"."u"."e"."f"."l"."e"."P"."a"."$"."$"."w"."0"."r"."d");
 
     $sql = "SELECT * FROM logkey;";
 
