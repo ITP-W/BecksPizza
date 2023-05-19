@@ -1,0 +1,29 @@
+body{
+     background-color: #cfd8dc;
+}
+
+.col, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .row{
+     margin-left: 0;
+     margin-right: 0;
+     padding-left: 0;
+     padding-right: 0;
+}
+
+.jumbotron{
+     background-position: center;
+     background-size: cover;
+     background-repeat: no-repeat;
+     margin-bottom: 0;
+}
+
+.border-elegant{
+     border-color: #2E2E2E !important;
+}
+
+.hidden{
+     display: none;
+}
+
+.point:hover{
+     cursor: pointer;
+}
