@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0ae39901-0f2b-4a97-9d64-2392c1366830" name="Becks-Pizza (project level)" url="http://becks-pizza.bplaced.net">
+        <fileTransfer rootFolder="/www/" host="becks-pizza.bplaced.net" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" showHiddenFiles="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
