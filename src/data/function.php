@@ -1,7 +1,8 @@
 <?php
+require('deployment.php');
 require('passage.php');
 
-$asyncQuery = new PDO("mysql:host=localhost;dbname=example", "example_manage", "Example_0815");
+$asyncQuery = new PDO(getDatabase());
 
 $method = $_GET["method"];
 $target = $_GET["target"];
