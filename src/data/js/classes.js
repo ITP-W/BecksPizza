@@ -94,3 +94,35 @@ class Variante{
             +'</div>';
     }
 }
+
+class Carousel{
+    constructor(anzahl, bilder) {
+        this.anzahl = anzahl;
+        this.bilder = bilder;
+    }
+
+    getCount(){
+        return this.anzahl;
+    }
+
+    getIndicators(){
+        let htmlIndicators = '<li class="primary-color active" data-slide-to="0" data-target="#carouselFooter"></li>';
+        for (let i = 1; i <= this.anzahl; i++){
+            htmlIndicators.concat('<li class="primary-color" data-slide-to="' + (i) + '" data-target="#carouselFooter"></li>');
+        }
+        return htmlIndicators;
+    }
+
+    getPictures(){
+        let htmlPictures = '<div class="carousel-item active">\n' +
+            '<img alt="Slide number 1" class="d-block w-100" src="' + this.bilder[0] + '">\n' +
+            '</div>';
+        for (let i = 1; i <= this.anzahl; i++){
+            htmlPictures.concat('<div class="carousel-item">\n' +
+                '<img alt="Slide number ' + (i + 1) + '" class="d-block w-100" src="' + this.bilder[i] + '">\n' +
+                '</div>');
+        }
+        return htmlPictures;
+    }
+
+}

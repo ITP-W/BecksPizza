@@ -101,6 +101,7 @@ async function loadSite() {
     await printPizzas(termin);
     await showBuchungen(termin);
     printVarianten();
+    printCarousel();
     $("#btn-loadingStop").click();
 }
 
@@ -253,6 +254,30 @@ function printVarianten(){
     }
 }
 
+function printCarousel(){
+    $("#carousel-indicators").text("");
+    $("#carousel-inner").text("");
+    let antwortData = [];
+    let countCarousel;
+    const anfrage = new XMLHttpRequest();
+    anfrage.open("GET", "./src/data/function.php?method=get&target=carousel", true);
+    anfrage.send();
+    anfrage.onload = function () {
+        let antwortString = (anfrage.responseText).substring(1);
+        antwortData = antwortString.split(',');
+
+        countCarousel = antwortData[0];
+        antwortData.shift();
+        const carousel = new Carousel(countCarousel, antwortData);
+
+        //rendert indicators
+        $('#carousel-indicators').append(carousel.getIndicators());
+
+        //rendert pictures
+        $('#carousel-inner').append(carousel.getPictures());
+    }
+}
+
 function lockPizza(bestellung) {
     //lädt die Varianten aus der Datenbank
     const abfrage = new XMLHttpRequest();
@@ -352,10 +377,12 @@ function makeSummary(bestellung){
 
 function summSummary(){
 
+    $('#zusammenfassungGesamt').text("");
+
     //erstellt aus einzelpunkten einen gesamtwert für zusammenfassung
-    const bestellungen = document.getElementById('zusammenfassung').childNodes;
-    const pizzas = [];
-    const varianten = [[]];
+    const bestellungen = new Array[document.getElementById('zusammenfassung').childNodes];
+    let pizzas = [];
+    let varianten = [[]];
 
     //einzelne pizzas erfassen
     for(let n = 0; n < bestellungen.length; n++){
@@ -363,31 +390,24 @@ function summSummary(){
     }
 
     //einzelne varianten erfassen
-    let i = 0;
-    for(let n =0; n < pizzas.length; n++){
+    let variante = 0;
+    for(let n = 0; n < pizzas.length; n++){
         if (varianten.includes(pizzas[n]) === false){
-            varianten[i] = pizzas[n];
-            i++;
+            varianten[variante] = pizzas[n];
+            variante++;
         }
     }
     varianten.sort();
 
-    //anzahl pizzas pro variante erfassen
-    let counter = [];
-    varianten.forEach(i =>counter.push(0))
-    for(let n = 0; n <= pizzas.length; n++){
-        for (let i = 0; i <= varianten.length; i++){
-            if (varianten[i] === pizzas[n]){
-                counter[i]++;
-                break;
-            }
-
-        }
-    }
-
-    //gesamtanzahl pro pizzavariante anzeigen
+    //anzahl pizzas pro variante erfassen und anzeigen
     for (let n = 0; n < varianten.length; n++){
-        const summaryString = "<p>Pizzavariante "+varianten[n]+" | Anzahl "+counter[n]+"</p>";
+        let count = 0;
+        for (let c = 0; c < pizzas.length; c++){
+            if (pizzas[c] === varianten[n]){
+                count++;
+            }
+        }
+        const summaryString = "<p>Pizzavariante " + varianten[n] + " | Anzahl " + count + "</p>";
         $('#zusammenfassungGesamt').append(summaryString);
     }
 }

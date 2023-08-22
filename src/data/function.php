@@ -1,14 +1,20 @@
 <?php
-require('deployment.php');
-require('passage.php');
+require ('deployment.php');
+require ('carousel.php');
+require ('passage.php');
 
-$asyncQuery = new PDO(getDatabase());
+$asyncQuery = getDatabase();
 
 $method = $_GET["method"];
 $target = $_GET["target"];
+$db = false;
 
 switch ($target) {
+    case "carousel":
+        $carousel_data = include('carousel.php');
+        break;
     case "head":
+        $db = true;
         switch ($method){
             case "get":
                 $sql = "SELECT * FROM `ueberschrift`;";
@@ -20,6 +26,7 @@ switch ($target) {
         }
         break;
     case "termin":
+        $db = true;
         switch ($method) {
             case "get":
                 $sql = "SELECT * FROM `termin` WHERE id = (SELECT MAX(id) FROM `termin`);";
@@ -35,6 +42,7 @@ switch ($target) {
         }
         break;
     case "pizza":
+        $db = true;
         switch ($method) {
             case "get":
                 $pid = $_GET["pid"];
@@ -51,6 +59,7 @@ switch ($target) {
         }
         break;
     case "bestellung":
+        $db = true;
         switch ($method) {
             case "get":
                 $sql = "SELECT `bestellung`.`vorn`, `bestellung`.`nachn`, `bestellung`.`pizza`, `bestellung`.`variante` FROM `bestellung`;";
@@ -69,6 +78,7 @@ switch ($target) {
         }
         break;
     case "variante":
+        $db = true;
         switch ($method) {
             case "get":
                 $sql = "SELECT * FROM `variante`;";
@@ -86,26 +96,42 @@ switch ($target) {
         }
         break;
     case "key":
+        $db = true;
         $sql = "SELECT * FROM bestellung WHERE bestellung.id < 1;";
         $result = tryToPass($method);
         break;
-    default:
-        $sql = "SELECT * FROM termin WHERE termin.id < 1;";
+}
+
+if ($db) {
+    $kommando = $asyncQuery->prepare($sql);
+    $kommando->execute();
+    $data = $kommando->fetchAll(PDO::FETCH_OBJ);
 }
 
 
-$kommando = $asyncQuery->prepare($sql);
-$kommando->execute();
-$data = $kommando->fetchAll(PDO::FETCH_OBJ);
-
-
 switch ($target) {
+    case "carousel":
+        $anzahlBilder = $carousel_data['anzahlBilder'];
+        $bildNamen = $carousel_data['bildNamen'];
+        switch ($method) {
+            case "get":
+                if ($anzahlBilder > 0 && $anzahlBilder != null) {
+                    echo "," . $anzahlBilder . "," . implode(',', $bildNamen);
+                } else {
+                    echo '!Keine Datensätze gefunden!';
+                }
+                break;
+            case "set":
+                echo "done";
+                break;
+        }
+        break;
     case "head":
         switch ($method) {
             case "get":
                 if (count($data) > 0) {
                     foreach ($data as $heading) {
-                        echo ',' .$heading->id.',' . $heading->head;
+                        echo ',' .$heading->id. ',' . $heading->head;
                     }
                 } else {
                     echo '!Keine Datensätze gefunden!';

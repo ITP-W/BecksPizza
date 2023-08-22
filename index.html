@@ -174,36 +174,14 @@
             <div class="col-md-4">
                 <div class="carousel slide carousel-fade" data-ride="carousel" id="carouselFooter">
                     <!--Indicators-->
-                    <ol class="carousel-indicators">
-                        <li class="primary-color active" data-slide-to="0" data-target="#carouselFooter"></li>
-                        <li class="primary-color" data-slide-to="1" data-target="#carouselFooter"></li>
-                        <li class="primary-color" data-slide-to="2" data-target="#carouselFooter"></li>
-                        <li class="primary-color" data-slide-to="3" data-target="#carouselFooter"></li>
-                        <li class="primary-color" data-slide-to="4" data-target="#carouselFooter"></li>
-                        <li class="primary-color" data-slide-to="5" data-target="#carouselFooter"></li>
+                    <ol id="carousel-indicators" class="carousel-indicators">
+
                     </ol>
                     <!--/Indicators-->
                     <!--Slides-->
-                    <div class="carousel-inner" role="listbox">
+                    <div id="carousel-inner" class="carousel-inner" role="listbox">
 
-                        <div class="carousel-item active">
-                            <img alt="First slide" class="d-block w-100" src="./src/data/media/pic/pizza001.jpg">
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Second slide" class="d-block w-100" src="./src/data/media/pic/pizza002.jpg">
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Third slide" class="d-block w-100" src="./src/data/media/pic/pizza003.jpg">
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Fourth slide" class="d-block w-100" src="./src/data/media/pic/pizza004.jpg">
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Fifth slide" class="d-block w-100" src="./src/data/media/pic/pizza005.jpg">
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Sixth slide" class="d-block w-100" src="./src/data/media/pic/pizza006.jpg">
-                        </div>
+
 
                     </div>
                     <!--/Slides-->
@@ -222,6 +200,10 @@
 
             <div class="col-md-3">
                 <img alt="comic" class="img-fluid" src="./src/data/media/chef_old.jpg">
+                <li class="mb-3 mt-3 list-unstyled">
+                    <button class="btn btn-sm btn-grey viewUser" data-target="#adminModalStock" data-toggle="modal" id="btn-adminModalStock" type="button">Administration</button>
+                    <button class="btn btn-sm btn-grey viewAdmin hidden" data-target="#adminModalEdit" data-toggle="modal" id="btn-adminModalEdit" type="button">Administration</button>
+                </li>
             </div>
 
             <div class="col-md-4">
@@ -244,14 +226,16 @@
                     <li class="mb-3">
                         <a href="https://github.com/AImperator"><i class="fab fa-github"></i> AImperator auf GitHub</a>
                     </li>
-                    <li class="mb-3 list-unstyled">
-                        <button class="btn btn-sm btn-grey viewUser" data-target="#adminModalStock" data-toggle="modal" id="btn-adminModalStock" type="button">Administration</button>
-                        <button class="btn btn-sm btn-grey viewAdmin hidden" data-target="#adminModalEdit" data-toggle="modal" id="btn-adminModalEdit" type="button">Administration</button>
-                    </li>
                 </ul>
 
             </div>
 
+        </div>
+
+        <div class="row-cols-1 text-center">
+            <p>Diese Seite ist rein als Demonstration gedacht und darf nicht für kommerzielle oder sonstige Zwecke benutzt werden.<br>
+                ITP-W distanziert sich ausdrücklich von jeglichem Missbrauch oder sonstigen Verwendungen.<br>
+            </p>
         </div>
 
     </div>

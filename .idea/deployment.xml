@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="DefaultLocalDev" createEmptyFolders="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="Example-Testserver" createEmptyFolders="true">
     <serverData>
       <paths name="DefaultLocalDev">
         <serverdata>
           <mappings>
             <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="Example-Testserver">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/www/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ITP-W-Testserver">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
