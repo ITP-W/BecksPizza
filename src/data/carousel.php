@@ -1,56 +1,64 @@
 <?php
-require ('deployment.php');
 
-$ordnerpfad = getPictureDir();
-$anzahlBilder = getNumberOfImagesInFolder($ordnerpfad);
-$bildNamen = getImageNamesInFolder($ordnerpfad);
+class CarouselService
+{
+    public function getCarouselData(): array
+    {
+        require_once('deployment.php');
+        $ordnerpfad = getPictureDir();
+        $anzahlBilder = self::getNumberOfImagesInFolder($ordnerpfad);
+        $bildNamen = self::getImageNamesInFolder($ordnerpfad);
 
-function getNumberOfImagesInFolder($ordnerpfad) {
-    $anzahlBilder = 0;
-
-    if (is_dir($ordnerpfad)) {
-        if ($handle = opendir($ordnerpfad)) {
-            while (false !== ($datei = readdir($handle))) {
-                if ($datei != "." && $datei != ".." && is_file($ordnerpfad . '/' . $datei) && isImageFile($datei)) {
-                    $anzahlBilder++;
-                }
-            }
-            closedir($handle);
-        }
-    } else {
-        echo "Der angegebene Ordner existiert nicht.";
+        return array(
+            'anzahlBilder' => $anzahlBilder,
+            'bildNamen' => $bildNamen
+        );
     }
 
-    return $anzahlBilder;
-}
+    private function getNumberOfImagesInFolder($ordnerpfad): int
+    {
+        $anzahlBilder = 0;
 
-function getImageNamesInFolder($ordnerpfad) {
-    $bildNamen = [];
-
-    if (is_dir($ordnerpfad)) {
-        if ($handle = opendir($ordnerpfad)) {
-            while (false !== ($datei = readdir($handle))) {
-                if ($datei != "." && $datei != ".." && is_file($ordnerpfad . '/' . $datei) && isImageFile($datei)) {
-                    $bildNamen[] = $datei;
+        if (is_dir($ordnerpfad)) {
+            if ($handle = opendir($ordnerpfad)) {
+                while (false !== ($datei = readdir($handle))) {
+                    if ($datei != "." && $datei != ".." && is_file($ordnerpfad . '/' . $datei) && self::isImageFile($datei)) {
+                        $anzahlBilder++;
+                    }
                 }
+                closedir($handle);
             }
-            closedir($handle);
+        } else {
+            echo "Der angegebene Ordner existiert nicht.";
         }
-    } else {
-        echo "Der angegebene Ordner existiert nicht.";
+
+        return $anzahlBilder;
     }
 
-    return $bildNamen;
+    private function getImageNamesInFolder($ordnerpfad): array
+    {
+        $bildNamen = [];
+
+        if (is_dir($ordnerpfad)) {
+            if ($handle = opendir($ordnerpfad)) {
+                while (false !== ($datei = readdir($handle))) {
+                    if ($datei != "." && $datei != ".." && is_file($ordnerpfad . '/' . $datei) && self::isImageFile($datei)) {
+                        $bildNamen[] = $datei;
+                    }
+                }
+                closedir($handle);
+            }
+        } else {
+            echo "Der angegebene Ordner existiert nicht.";
+        }
+
+        return $bildNamen;
+    }
+
+    private function isImageFile($datei): bool
+    {
+        $erlaubteErweiterungen = ['jpg', 'jpeg', 'png', 'gif'];
+        $dateiErweiterung = pathinfo($datei, PATHINFO_EXTENSION);
+        return in_array(strtolower($dateiErweiterung), $erlaubteErweiterungen);
+    }
 }
-
-function isImageFile($datei) {
-    $erlaubteErweiterungen = ['jpg', 'jpeg', 'png', 'gif'];
-    $dateiErweiterung = pathinfo($datei, PATHINFO_EXTENSION);
-    return in_array(strtolower($dateiErweiterung), $erlaubteErweiterungen);
-}
-
-return array(
-    'anzahlBilder' => $anzahlBilder,
-    'bildNamen' => $bildNamen
-);
-

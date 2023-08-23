@@ -1,7 +1,9 @@
 // noinspection JSJQueryEfficiency
 
 $(document).ready(function () {
-    let neueBestellung = new Bestellung();
+
+    //todo: Diese neue Bestellung entfernen und einen Buffer als .json im vorbereiteten Ordner dafür einsetzen
+    let neueBestellung = new Bestellung(null, null, null, null);
 
     //events
     $(document).on("click", "#btn-setUser", function () {
@@ -279,38 +281,17 @@ function printCarousel(){
 }
 
 function lockPizza(bestellung) {
-    //lädt die Varianten aus der Datenbank
-    const abfrage = new XMLHttpRequest();
-    abfrage.open("GET", "./src/data/function.php?method=get&target=variante", true);
-    abfrage.send();
-    abfrage.onload = function () {
-        let antwort = (abfrage.responseText).substring(1);
-        const antwortDaten = antwort.split(",");
-        let sammlung = [];
 
-        //konvertiert Daten zu Pizza-Varianten
-        for (let i = 0; i < antwortDaten.length; i++) {
-            let variante = new Variante();
-            variante.id = parseInt(antwortDaten[i]);
-            i++;
-            variante.name = antwortDaten[i];
-            i++;
-            variante.beschreibung = antwortDaten[i];
-            sammlung.push(variante);
-        }
-
-        //Sperrt die gewählte Pizza und ergänzt Eintragungen
-        const angepassterSelector = parseInt(bestellung.variante)-1;
-        const variantenName = sammlung[angepassterSelector].name;
-        const scope = [document.getElementById('pizza-' + bestellung.pizza),
-            document.getElementById('namePizza-' + bestellung.pizza),
-            document.getElementById('variantePizza-' + bestellung.pizza),
-            document.getElementById('mask-' + bestellung.pizza)];
-        $(scope[0]).addClass("disabled");
-        $(scope[1]).text(bestellung.vorn + " " + bestellung.nachn);
-        $(scope[2]).text(variantenName);
-        $(scope[3]).removeClass("rgba-green-light").addClass("rgba-red-light");
-    };
+    //Sperrt die gewählte Pizza und ergänzt Eintragungen
+    const variante = new Variante(bestellung.variante);
+    const scope = [document.getElementById('pizza-' + bestellung.pizza),
+        document.getElementById('namePizza-' + bestellung.pizza),
+        document.getElementById('variantePizza-' + bestellung.pizza),
+        document.getElementById('mask-' + bestellung.pizza)];
+    $(scope[0]).addClass("disabled");
+    $(scope[1]).text(bestellung.vorn + " " + bestellung.nachn);
+    $(scope[2]).text(variante.name);
+    $(scope[3]).removeClass("rgba-green-light").addClass("rgba-red-light");
 }
 
 function unlockPizza(pizzaID) {
@@ -328,7 +309,7 @@ function saveBestellung(bestellung) {
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "./src/data/function.php?method=set&target=bestellung&vn=" + bestellung.vorn + "&nn=" + bestellung.nachn + "&pi=" + parseInt(bestellung.pizza) + "&v=" + parseInt(bestellung.variante), true);
     xhttp.send();
-    lockPizza(bestellung);
+    showBuchungen();
 }
 
 async function showBuchungen() {
@@ -342,6 +323,7 @@ async function showBuchungen() {
             anfrage.open("GET", "./src/data/function.php?method=get&target=bestellung", true);
             anfrage.send();
             let antwortDaten;
+            let bestellungen = [];
             anfrage.onload = function () {
                 const antwortString = (anfrage.responseText).substring(1);
                 antwortDaten = antwortString.split(",");
@@ -356,12 +338,10 @@ async function showBuchungen() {
                     vergeben.pizza = antwortDaten[n];
                     n++;
                     vergeben.variante = antwortDaten[n];
+                    bestellungen.push(vergeben);
                     lockPizza(vergeben);
-                    makeSummary(vergeben);
                 }
-
-                //erstellt die gesamt zusammenfassung
-                summSummary();
+                makeSummary(bestellungen);
 
                 //markierung für abgeschlossenen prozess
                 done("success")
@@ -370,46 +350,36 @@ async function showBuchungen() {
     });
 }
 
-function makeSummary(bestellung){
-    const summaryString = "<p value='"+bestellung.variante+"'>"+bestellung.vorn+" "+bestellung.nachn+" | "+bestellung.variante+"</p>";
-    $('#zusammenfassung').append(summaryString);
+function makeSummary(bestellungen){
+
+    if (bestellungen && bestellungen.length > 0) {
+        $('#zusammenfassung').text("");
+        bestellungen.forEach(bestellung => {
+            const summaryString = "<p value='"+bestellung.variante+"'>"+bestellung.vorn+" "+bestellung.nachn+" | "+bestellung.variante+"</p>";
+            $('#zusammenfassung').append(summaryString);
+        });
+        summSummary(bestellungen);
+    }
 }
 
-function summSummary(){
+function summSummary(bestellungen){
 
     $('#zusammenfassungGesamt').text("");
+    let varianten = new Map;
 
-    //erstellt aus einzelpunkten einen gesamtwert für zusammenfassung
-    const bestellungen = new Array[document.getElementById('zusammenfassung').childNodes];
-    let pizzas = [];
-    let varianten = [[]];
-
-    //einzelne pizzas erfassen
-    for(let n = 0; n < bestellungen.length; n++){
-        pizzas[n] = parseInt(bestellungen[n].attributes[0].nodeValue);
-    }
-
-    //einzelne varianten erfassen
-    let variante = 0;
-    for(let n = 0; n < pizzas.length; n++){
-        if (varianten.includes(pizzas[n]) === false){
-            varianten[variante] = pizzas[n];
-            variante++;
+    //Aus Bestellungen die Varianten auslesen und zählen, wie viele Bestellungen es pro Variante gibt
+    bestellungen.forEach(bestellung => {
+        if (varianten.has(bestellung.variante)) {
+            varianten.set(bestellung.variante, varianten.get(bestellung.variante) + 1);
+        } else {
+            varianten.set(bestellung.variante, 1);
         }
-    }
-    varianten.sort();
+    });
 
-    //anzahl pizzas pro variante erfassen und anzeigen
-    for (let n = 0; n < varianten.length; n++){
-        let count = 0;
-        for (let c = 0; c < pizzas.length; c++){
-            if (pizzas[c] === varianten[n]){
-                count++;
-            }
-        }
-        const summaryString = "<p>Pizzavariante " + varianten[n] + " | Anzahl " + count + "</p>";
+    varianten.forEach((anzahl, variante) => {
+        const summaryString = `<p>Pizzavariante ${variante} | Anzahl ${anzahl}</p>`;
         $('#zusammenfassungGesamt').append(summaryString);
-    }
+    })
 }
 
 function switchView(to){

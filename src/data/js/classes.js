@@ -73,10 +73,10 @@ class Bestellung {
 }
 
 class Variante{
-    constructor(id, name, beschreibung) {
+    constructor(id) {
         this.id = id;
-        this.name = name;
-        this.beschreibung = beschreibung;
+        this.name = this.getData("name", this.id);
+        this.beschreibung = this.getData("beschreibung", this.id);
     }
 
     convert_Variante(){
@@ -92,6 +92,46 @@ class Variante{
             +'<p>'+this.beschreibung+'</p>\n'
             +'<button id="btn-delete-Variante-'+this.id+'" class="btn btn-danger" type="button">Entfernen</button>\n'
             +'</div>';
+    }
+
+    private getData(forField, value): string
+    {
+        let searchedVariante;
+
+        //lädt varianten aus datenbank
+        const anfrage = new XMLHttpRequest();
+        anfrage.open("GET", "./src/data/function.php?method=get&target=variante", true);
+        anfrage.send();
+        let antwortDaten;
+        let varianten = [];
+        anfrage.onload = function () {
+            const antwortString = (anfrage.responseText).substring(1);
+            antwortDaten = antwortString.split(",");
+
+            //konvertiert Daten zu Varianten
+            for (let n = 0; n < antwortDaten.length; n++) {
+                let variante = new Variante();
+                variante.id = antwortDaten[n];
+                n++;
+                variante.name = antwortDaten[n];
+                n++;
+                variante.beschreibung = antwortDaten[n];
+                varianten.push(variante);
+            }
+        };
+
+        varianten.forEach(variante => {
+            if (variante.id === value){
+                searchedVariante = variante;
+            }
+        });
+
+        switch (forField){
+            case "name":
+                return searchedVariante.name;
+            case "beschreibung":
+                return searchedVariante.beschreibung;
+        }
     }
 }
 

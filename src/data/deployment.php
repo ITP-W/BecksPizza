@@ -5,9 +5,7 @@ function getDatabase(): PDO
     return new PDO("mysql:host=localhost;dbname=example", "example_manage", "Example_0815");
 }
 
-
-//todo: GoogleDrive mit Ordner für Bilder einrichten. Ordner freigeben und Freigabelink als Pfad eingeben.
 function getPictureDir(): string
 {
-    return "";
+    return "https://drive.google.com/drive/folders/1Ci3J1stBBbv7d7mCKP_qEaLfw2g4j4tW?usp=sharing";
 }

@@ -1,20 +1,14 @@
 <?php
-require('deployment.php');
 
-function tryToPass($input)
+function tryToPass($input): string
 {
-
-    $asyncQuery = new PDO(getDatabase());
-
-    $sql = "SELECT * FROM logkey;";
+    require_once ('deployment.php');
+    $asyncQuery = (new DeploymentService)->getDatabase();
+    $sql = "SELECT * FROM 'logkey';";
 
     $kommando = $asyncQuery->prepare($sql);
     $kommando->execute();
     $data = $kommando->fetch();
 
-    if ($data[0] == $input) {
-        return "pass";
-    } else {
-        return "fail";
-    }
+    if ($data[0] == $input) return "pass"; else return "fail";
 }
