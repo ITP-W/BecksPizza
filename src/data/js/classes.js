@@ -136,9 +136,24 @@ class Variante{
 }
 
 class Carousel{
-    constructor(anzahl, bilder) {
-        this.anzahl = anzahl;
-        this.bilder = bilder;
+    private constructor() {
+        let antwortData = [];
+        let countCarousel;
+        let fileNames = [];
+        const anfrage = new XMLHttpRequest();
+        anfrage.open("GET", "./src/data/function.php?method=get&target=carousel", true);
+        anfrage.send();
+        anfrage.onload = function () {
+            let antwortString = (anfrage.responseText).substring(1);
+            antwortData = antwortString.split(',');
+
+            countCarousel = antwortData[0];
+            antwortData.shift();
+            fileNames = antwortData;
+        }
+
+        this.anzahl = countCarousel;
+        this.bilder = fileNames;
     }
 
     getCount(){

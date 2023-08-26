@@ -1,4 +1,3 @@
-// noinspection JSJQueryEfficiency
 
 $(document).ready(function () {
 
@@ -259,25 +258,13 @@ function printVarianten(){
 function printCarousel(){
     $("#carousel-indicators").text("");
     $("#carousel-inner").text("");
-    let antwortData = [];
-    let countCarousel;
-    const anfrage = new XMLHttpRequest();
-    anfrage.open("GET", "./src/data/function.php?method=get&target=carousel", true);
-    anfrage.send();
-    anfrage.onload = function () {
-        let antwortString = (anfrage.responseText).substring(1);
-        antwortData = antwortString.split(',');
+    const carousel = new Carousel();
 
-        countCarousel = antwortData[0];
-        antwortData.shift();
-        const carousel = new Carousel(countCarousel, antwortData);
+    //rendert indicators
+    $('#carousel-indicators').append(carousel.getIndicators());
 
-        //rendert indicators
-        $('#carousel-indicators').append(carousel.getIndicators());
-
-        //rendert pictures
-        $('#carousel-inner').append(carousel.getPictures());
-    }
+    //rendert pictures
+    $('#carousel-inner').append(carousel.getPictures());
 }
 
 function lockPizza(bestellung) {

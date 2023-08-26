@@ -1,70 +1,45 @@
 <?php
-require ('carousel.php');
-require ('statement.php');
-require ('passage.php');
 
-$method = $_GET["method"];
 $target = $_GET["target"];
-$db = false;
+$method = $_GET["method"];
 
 switch ($target) {
     case "carousel":
-        $carousel_data = (new CarouselService)->getCarouselData();
-        $anzahlBilder = $carousel_data['anzahlBilder'];
-        $bildNamen = $carousel_data['bildNamen'];
-        break;
-    case "head":
-        $db = true;
-        $sql = (new StatementService)->getHeadSql($_GET);
-        break;
-    case "termin":
-        $db = true;
-        $sql = (new StatementService)->getTerminSql($_GET);
-        break;
-    case "pizza":
-        $db = true;
-        $sql = (new StatementService)->getPizzaSql($_GET);
-        break;
-    case "bestellung":
-        $db = true;
-        $sql = (new StatementService)->getBestellungSql($_GET);
-        break;
-    case "variante":
-        $db = true;
-        $sql = (new StatementService)->getVarianteSql($_GET);
-        break;
-    case "key":
-        $db = true;
-        $sql = (new StatementService)->getKeySqlStatement($_GET);
-        $result = tryToPass($method);
-        break;
-}
-
-if ($db) {
-    require_once ('query.php');
-    $data = query($sql);
-}
-
-
-switch ($target) {
-    case "carousel":
-        switch ($method) {
-            case "get":
-                if ($anzahlBilder > 0 && $anzahlBilder != null) {
-                    echo "," . $anzahlBilder . "," . implode(',', $bildNamen);
-                } else {
-                    echo '!Keine Datensätze gefunden!';
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService())->getCarouselSql($_GET);
+        $data = (new QueryService())->query($sql);
+        if ($method === "count"){
+            $count = $data["count"];
+            if (is_int($count) and !empty($count)){
+                echo $count;
+            } else {
+                echo '!Keine Datensätze gefunden!';
+            }
+        }
+        elseif ($method === "get") {
+            if (is_array($data) and !empty($data)) {
+                $pictureString = "";
+                foreach ($data as $picture) {
+                    $pictureString = $pictureString . ',' . $picture;
                 }
-                break;
-            case "set":
-                echo "done";
-                break;
+                echo $pictureString;
+            } else {
+                echo '!Keine Datensätze gefunden!';
+            }
+        }
+        elseif ($method === "set" or $method === "drop"){
+            echo "done";
         }
         break;
     case "head":
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService)->getHeadSql($_GET);
+        $data = (new QueryService())->query($sql);
         switch ($method) {
             case "get":
-                if (count($data) > 0) {
+                if (is_array($data) and !empty($data)) {
                     foreach ($data as $heading) {
                         echo ',' .$heading->id. ',' . $heading->head;
                     }
@@ -78,9 +53,13 @@ switch ($target) {
         }
         break;
     case "termin":
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService)->getTerminSql($_GET);
+        $data = (new QueryService())->query($sql);
         switch ($method) {
             case "get":
-                if (count($data) > 0) {
+                if (is_array($data) and !empty($data)) {
                     foreach ($data as $day) {
                         echo ',' . $day->id . ',' . $day->date . ',' . $day->startHH . ',' . $day->startMM . ',' . $day->endHH . ',' . $day->endMM . ',' . $day->intervall . ',' . $day->pizzas;
                     }
@@ -94,9 +73,13 @@ switch ($target) {
         }
         break;
     case "pizza":
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService)->getPizzaSql($_GET);
+        $data = (new QueryService())->query($sql);
         switch ($method) {
             case "get":
-                if (count($data) > 0) {
+                if (is_array($data) and !empty($data)) {
                     foreach ($data as $pizza) {
                         echo ',' . $pizza->id . ',' . $pizza->date . ',' . $pizza->timeHH . ',' . $pizza->timeMM . ',' . $pizza->pizza;
                     }
@@ -110,9 +93,13 @@ switch ($target) {
         }
         break;
     case "bestellung":
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService)->getBestellungSql($_GET);
+        $data = (new QueryService())->query($sql);
         switch ($method) {
             case "get":
-                if (count($data) > 0) {
+                if (is_array($data) and !empty($data)) {
                     foreach ($data as $bestellung) {
                         echo ',' . $bestellung->vorn . ',' . $bestellung->nachn . ',' . $bestellung->pizza . ',' . $bestellung->variante;
                     }
@@ -127,9 +114,13 @@ switch ($target) {
         }
         break;
     case "variante":
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService)->getVarianteSql($_GET);
+        $data = (new QueryService())->query($sql);
         switch ($method) {
             case "get":
-                if (count($data) > 0) {
+                if (is_array($data) and !empty($data)) {
                     foreach ($data as $variante) {
                         echo ',' . $variante->id . ',' . $variante->name . ',' . $variante->beschreibung;
                     }
@@ -144,5 +135,10 @@ switch ($target) {
         }
         break;
     case "key":
-        echo $result;
+        require_once ('StatementService.php');
+        require_once ('QueryService.php');
+        $sql = (new StatementService)->getKeySqlStatement($_GET);
+        $data = (new QueryService())->tryToPass($method);
+        echo $data;
+        break;
 }
