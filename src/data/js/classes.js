@@ -1,13 +1,100 @@
-class Termin {
-    constructor(id, date, startHH, startMM, endHH, endMM, intervall, pizzas) {
-        this.id = id;
-        this.date = date;
-        this.startHH = startHH;
-        this.startMM = startMM;
-        this.endHH = endHH;
-        this.endMM = endMM;
-        this.intervall = intervall;
-        this.pizzas = pizzas;
+
+
+class Bestellung {
+    constructor(vorn, nachn, pizza, variante) {
+        this.vorn = vorn;
+        this.nachn = nachn;
+        this.pizza = pizza;
+        this.variante = variante;
+    }
+}
+
+class Carousel{
+    private constructor() {
+        let antwortData = [];
+        let countCarousel;
+        let fileNames = [];
+        const anfrage = new XMLHttpRequest();
+        anfrage.open("GET", "./src/data/function.php?method=get&target=carousel", true);
+        anfrage.send();
+        anfrage.onload = function () {
+            let antwortString = (anfrage.responseText).substring(1);
+            antwortData = antwortString.split(',');
+
+            countCarousel = antwortData[0];
+            antwortData.shift();
+            fileNames = antwortData;
+        }
+
+        this.anzahl = countCarousel;
+        this.bilder = fileNames;
+    }
+
+    getCount(){
+        return this.anzahl;
+    }
+
+    getIndicators(){
+        let htmlIndicators = '<li class="primary-color active" data-slide-to="0" data-target="#carouselFooter"></li>';
+        for (let i = 1; i <= this.anzahl; i++){
+            htmlIndicators.concat('<li class="primary-color" data-slide-to="' + (i) + '" data-target="#carouselFooter"></li>');
+        }
+        return htmlIndicators;
+    }
+
+    getPictures(){
+        let htmlPictures = '<div class="carousel-item active">\n' +
+            '<img alt="Slide number 1" class="d-block w-100" src="' + this.bilder[0] + '">\n' +
+            '</div>';
+        for (let i = 1; i <= this.anzahl; i++){
+            htmlPictures.concat('<div class="carousel-item">\n' +
+                '<img alt="Slide number ' + (i + 1) + '" class="d-block w-100" src="' + this.bilder[i] + '">\n' +
+                '</div>');
+        }
+        return htmlPictures;
+    }
+
+}
+
+class Head{
+    constructor() {
+        this.getData();
+        this.id;
+        this.head;
+    }
+
+    //Setzt die ID
+    setId(data){
+        this.id = data;
+    }
+
+    //Setzt die Überschrift
+    setHead(data){
+        this.head = data;
+    }
+
+    //Gibt HTML-Part zur Darstellung der Überschrift zurück
+    convertHead(): string
+    {
+        return this.head;
+    }
+
+    //Lädt Überschrift aus Datenbank und vervollständigt die Daten der Klasse
+    private getData()
+    {
+        QueryService.getData("?method=get&target=head")
+            .then(response => {
+                //konvertiert Daten zu Überschrift
+                let data = response.split(",");
+                const id = data[0];
+                const head = data[1];
+                //vervollständigt die Daten der Klasse
+                this.setId(id);
+                this.setHead(head);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 }
 
@@ -63,30 +150,69 @@ class Pizza {
     }
 }
 
-class Bestellung {
-    constructor(vorn, nachn, pizza, variante) {
-        this.vorn = vorn;
-        this.nachn = nachn;
-        this.pizza = pizza;
-        this.variante = variante;
+class Termin {
+    constructor() {
+        this.getData();
+        this.id;
+        this.date;
+        this.startHH;
+        this.startMM;
+        this.endHH;
+        this.endMM;
+        this.intervall;
+        this.pizzas;
+    }
+
+    //Hold die Daten zum Termin aus der Datenbank und fügt sie dem Termin Objekt hinzu
+    getData(){
+        const data = QueryService.getData("?method=get&target=termin")
+            .then(response => {
+                const data = response.split(",");
+                this.id = parseInt(data[0]);
+                this.date = parseInt(data[1]);
+                this.startHH = parseInt(data[2]);
+                this.startMM = parseInt(data[3]);
+                this.endHH = parseInt(data[4]);
+                this.endMM = parseInt(data[5]);
+                this.intervall = parseInt(data[6]);
+                this.pizzas = parseInt(data[7]);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 }
 
 class Variante{
     constructor(id) {
         this.id = id;
-        this.name = this.getData("name", this.id);
-        this.beschreibung = this.getData("beschreibung", this.id);
+        this.name;
+        this.beschreibung;
+        this.getData();
     }
 
-    convert_Variante(){
+    //Setzt den Namen der Variante
+    setName(data){
+        this.name = data;
+    }
+
+    //Setzt die Beschreibung der Variante
+    setBeschreibung(data){
+        this.beschreibung = data;
+    }
+
+    //Gibt HTML-Part zur Darstellung der Varianten zurück
+    convert_Variante(): string
+    {
         return '<div class="row-cols-1 border-bottom border-elegant" id="variante-'+this.id+'">\n'
-            +'<button class="btn w-50 btn-brown" id="btn-Variante-'+this.id+'" type="button">'+this.name+'</button>\n'
+            +'<button id="btn-Variante-'+this.id+'" class="btn w-50 btn-brown" type="button">'+this.name+'</button>\n'
             +'<p>'+this.beschreibung+'</p>\n'
             +'</div>';
     }
 
-    convert_Variante_Edit(){
+    //Gibt HTML-Part zum Bearbeiten der Varianten zurück
+    convert_Variante_Edit(): string
+    {
         return '<div class="row-cols-1 border-bottom border-elegant" id="pizzaVariante-'+this.id+'">\n'
             +'<p class="font-weight-bold">'+this.name+'</p>\n'
             +'<p>'+this.beschreibung+'</p>\n'
@@ -94,90 +220,46 @@ class Variante{
             +'</div>';
     }
 
-    private getData(forField, value): string
+    //Lädt Varianten aus Datenbank und vervollständigt die Daten der Klasse
+    private getData()
     {
-        let searchedVariante;
-
-        //lädt varianten aus datenbank
-        const anfrage = new XMLHttpRequest();
-        anfrage.open("GET", "./src/data/function.php?method=get&target=variante", true);
-        anfrage.send();
-        let antwortDaten;
-        let varianten = [];
-        anfrage.onload = function () {
-            const antwortString = (anfrage.responseText).substring(1);
-            antwortDaten = antwortString.split(",");
-
-            //konvertiert Daten zu Varianten
-            for (let n = 0; n < antwortDaten.length; n++) {
-                let variante = new Variante();
-                variante.id = antwortDaten[n];
-                n++;
-                variante.name = antwortDaten[n];
-                n++;
-                variante.beschreibung = antwortDaten[n];
-                varianten.push(variante);
-            }
-        };
-
-        varianten.forEach(variante => {
-            if (variante.id === value){
-                searchedVariante = variante;
-            }
-        });
-
-        switch (forField){
-            case "name":
-                return searchedVariante.name;
-            case "beschreibung":
-                return searchedVariante.beschreibung;
+        if (!this.name || !this.beschreibung){
+            QueryService.getData("?method=get&target=variante&id=" + this.id)
+                .then(response => {
+                    //konvertiert Daten zu Varianten
+                    let variante = [];
+                    variante.id = this.id;
+                    variante.name = response["name"];
+                    variante.beschreibung = response["beschreibung"];
+                    //vervollständigt die Daten der Klasse
+                    this.setName(variante.name);
+                    this.setBeschreibung(variante.beschreibung);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
     }
 }
 
-class Carousel{
-    private constructor() {
-        let antwortData = [];
-        let countCarousel;
-        let fileNames = [];
-        const anfrage = new XMLHttpRequest();
-        anfrage.open("GET", "./src/data/function.php?method=get&target=carousel", true);
-        anfrage.send();
-        anfrage.onload = function () {
-            let antwortString = (anfrage.responseText).substring(1);
-            antwortData = antwortString.split(',');
+class QueryService{
+    public static async getData(parameter){
+        return new Promise((resolve, reject) => {
+            try {
+                const anfrage = new XMLHttpRequest();
+                anfrage.open("GET", "./src/data/function.php" + parameter, true);
+                anfrage.send();
+                let antwortDaten;
+                anfrage.onload = function () {
+                    const antwortString = (anfrage.responseText).substring(1);
+                    antwortDaten = antwortString.split(",");
 
-            countCarousel = antwortData[0];
-            antwortData.shift();
-            fileNames = antwortData;
-        }
-
-        this.anzahl = countCarousel;
-        this.bilder = fileNames;
+                    resolve(antwortDaten);
+                };
+            }
+            catch (error){
+                reject(error);
+            }
+        });
     }
-
-    getCount(){
-        return this.anzahl;
-    }
-
-    getIndicators(){
-        let htmlIndicators = '<li class="primary-color active" data-slide-to="0" data-target="#carouselFooter"></li>';
-        for (let i = 1; i <= this.anzahl; i++){
-            htmlIndicators.concat('<li class="primary-color" data-slide-to="' + (i) + '" data-target="#carouselFooter"></li>');
-        }
-        return htmlIndicators;
-    }
-
-    getPictures(){
-        let htmlPictures = '<div class="carousel-item active">\n' +
-            '<img alt="Slide number 1" class="d-block w-100" src="' + this.bilder[0] + '">\n' +
-            '</div>';
-        for (let i = 1; i <= this.anzahl; i++){
-            htmlPictures.concat('<div class="carousel-item">\n' +
-                '<img alt="Slide number ' + (i + 1) + '" class="d-block w-100" src="' + this.bilder[i] + '">\n' +
-                '</div>');
-        }
-        return htmlPictures;
-    }
-
 }

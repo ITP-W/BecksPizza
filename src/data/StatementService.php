@@ -2,20 +2,27 @@
 
 class StatementService {
 
-    function getHeadSql ($request): string
+    function getBestellungSql ($request): string
     {
         $case= $request['method'];
 
         switch ($case) {
             case "get":
-                $sql = "SELECT * FROM `ueberschrift` WHERE `ìd` = 1;";
+                $sql = "SELECT `bestellung`.`vorn`, `bestellung`.`nachn`, `bestellung`.`pizza`, `bestellung`.`variante` FROM `bestellung`;";
                 break;
             case "set":
-                $h = $request["h"];
-                $sql = "TRUNCATE `ueberschrift`; INSERT INTO `ueberschrift` (`id`, `head`) VALUES (1, '" . $h . "');";
+                $vorn = $request["vorn"];
+                $nachn = $request["nachn"];
+                $pizza = $request["pizza"];
+                $variante = $request["variante"];
+                $sql = "INSERT INTO `bestellung` (`vorn`, `nachn`, `pizza`, `variante`) VALUES ('" . $vorn . "', '" . $nachn . "', '" . $pizza . "', '" . $variante . "');";
+                break;
+            case "drop":
+                $pizza = $request["pizza"];
+                $sql = "DELETE FROM `bestellung` WHERE `bestellung`.`pizza` = '" . $pizza . "';";
                 break;
             default:
-                $sql = "Fehler HeadSQL";
+                $sql = "Fehler BestellungSQL";
         }
 
         return $sql;
@@ -48,24 +55,20 @@ class StatementService {
         return $sql;
     }
 
-    function getTerminSql ($request): string
+    function getHeadSql ($request): string
     {
         $case= $request['method'];
 
         switch ($case) {
             case "get":
-                $sql = "SELECT * FROM `termin` WHERE `id` = 1;";
+                $sql = "SELECT * FROM `ueberschrift` WHERE `ìd` = 1;";
                 break;
             case "set":
-                $date = $request["date"];
-                $startHour = $request["startHour"];
-                $endHour = $request["endHour"];
-                $intervall = $request["intervall"];
-                $pizzas = $request["pizzas"];
-                $sql = "SET FOREIGN_KEY_CHECKS = 0; TRUNCATE `bestellung`; TRUNCATE `pizza`; TRUNCATE `termin`; SET FOREIGN_KEY_CHECKS = 1; INSERT INTO `termin` (`id`, `date`, `startHH`, `startMM`, `endHH`, `endMM`, `intervall`, `pizzas`) VALUES ('1', '" . $date . "', '" . $startHour . "', '0', '" . $endHour . "', '0', '" . $intervall . "', '" . $pizzas . "');";
+                $head = $request["head"];
+                $sql = "TRUNCATE `ueberschrift`; INSERT INTO `ueberschrift` (`id`, `head`) VALUES (1, '" . $head . "');";
                 break;
             default:
-                $sql = "Fehler TerminSQL";
+                $sql = "Fehler HeadSQL";
         }
 
         return $sql;
@@ -95,27 +98,24 @@ class StatementService {
         return $sql;
     }
 
-    function getBestellungSql ($request): string
+    function getTerminSql ($request): string
     {
         $case= $request['method'];
 
         switch ($case) {
             case "get":
-                $sql = "SELECT `bestellung`.`vorn`, `bestellung`.`nachn`, `bestellung`.`pizza`, `bestellung`.`variante` FROM `bestellung`;";
+                $sql = "SELECT * FROM `termin` WHERE `id` = 1;";
                 break;
             case "set":
-                $vorn = $request["vorn"];
-                $nachn = $request["nachn"];
-                $pizza = $request["pizza"];
-                $variante = $request["variante"];
-                $sql = "INSERT INTO `bestellung` (`vorn`, `nachn`, `pizza`, `variante`) VALUES ('" . $vorn . "', '" . $nachn . "', '" . $pizza . "', '" . $variante . "');";
-                break;
-            case "drop":
-                $pizza = $request["pizza"];
-                $sql = "DELETE FROM `bestellung` WHERE `bestellung`.`pizza` = '" . $pizza . "';";
+                $date = $request["date"];
+                $startHour = $request["startHour"];
+                $endHour = $request["endHour"];
+                $intervall = $request["intervall"];
+                $pizzas = $request["pizzas"];
+                $sql = "SET FOREIGN_KEY_CHECKS = 0; TRUNCATE `bestellung`; TRUNCATE `pizza`; TRUNCATE `termin`; SET FOREIGN_KEY_CHECKS = 1; INSERT INTO `termin` (`id`, `date`, `startHH`, `startMM`, `endHH`, `endMM`, `intervall`, `pizzas`) VALUES ('1', '" . $date . "', '" . $startHour . "', '0', '" . $endHour . "', '0', '" . $intervall . "', '" . $pizzas . "');";
                 break;
             default:
-                $sql = "Fehler BestellungSQL";
+                $sql = "Fehler TerminSQL";
         }
 
         return $sql;
